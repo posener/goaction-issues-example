@@ -1,0 +1,13 @@
+on:
+  issues:
+    types: [opened, reponed, closed, edited, labeled]  
+jobs:
+  issues:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+    - name: Example
+      uses: ./
+      with:
+        github-token: '${{ secrets.GITHUB_TOKEN }}'
