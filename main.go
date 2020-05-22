@@ -1,9 +1,9 @@
 /*
-Package main is an example of using goaction with Github APIs.
+An example of using goaction with Github APIs.
 
-Before reading this example, please go through the (simpler example)
-https://github.com/posener/goaction-example
+Before reading this example, please go through the (simpler example) https://github.com/posener/goaction-example
 
+To see how this example works, feel free to create (an issue) https://github.com/posener/goaction-issues-example/issues in this repository.
 */
 package main
 
@@ -48,30 +48,54 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Create a Github Client using the token provided through environment.
+	if token == "" {
+		log.Errorf("Token was not provided, please define the Github action 'with' 'github-token' as '${{ secrets.GITHUB_TOKEN }}'")
+	}
 	gh := actionutil.NewClientWithToken(ctx, token)
 
+	// Interact with the create issue according to the triggering action:
 	switch issue.GetAction() {
 	case "opened":
-		gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
+		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String(fmt.Sprintf("Hey there %s! Thanks for trying %s", goaction.Actor, goaction.ActionID)),
 		})
+		if err != nil {
+			log.Errorf("Failed commenting: %s", err)
+		}
 	case "closed":
-		gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
+		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String("Thanks for cleaning up!"),
 		})
+		if err != nil {
+			log.Errorf("Failed commenting: %s", err)
+		}
 	case "reponed":
-		gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
+		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String("Welcome back!"),
 		})
+		if err != nil {
+			log.Errorf("Failed commenting: %s", err)
+		}
 	case "edited":
-		gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
+		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String("I'll always have the last word!"),
 		})
+		if err != nil {
+			log.Errorf("Failed commenting: %s", err)
+		}
 	case "labeled":
 		if issue.GetLabel().GetName() == "bug" {
-			gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
+			_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 				Body: github.String("Really?? A bug? No way!"),
 			})
+			if err != nil {
+				log.Errorf("Failed commenting: %s", err)
+			}
+			_, err = gh.IssuesDeleteLabel(ctx, "bug")
+			if err != nil {
+				log.Errorf("Failed commenting: %s", err)
+			}
 		} else {
 			log.Warnf("Ignoring label %s", issue.GetLabel().GetName())
 		}
