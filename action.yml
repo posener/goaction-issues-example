@@ -3,11 +3,11 @@
 name: goaction-issues-example
 description: "An example of using goaction with Github APIs."
 inputs:
-  github-token:
+  GITHUB_TOKEN:
     description: "A token for Github APIs."
     required: true
 runs:
   using: docker
   image: Dockerfile
   env:
-    github-token: "${{ inputs.github-token }}"
+    GITHUB_TOKEN: "${{ inputs.GITHUB_TOKEN }}"
