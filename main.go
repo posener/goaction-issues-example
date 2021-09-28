@@ -91,7 +91,7 @@ func main() {
 			if err != nil {
 				log.Fatalf("Failed commenting: %s", err)
 			}
-			_, err = gh.IssuesDeleteLabel(ctx, "bug")
+			_, err = gh.IssuesRemoveLabelForIssue(ctx, issue.GetIssue().GetNumber(), "bug")
 			if err != nil {
 				log.Fatalf("Failed commenting: %s", err)
 			}
