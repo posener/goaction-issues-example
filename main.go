@@ -20,7 +20,7 @@ import (
 
 //goaction:required
 //goaction:description A token for Github APIs.
-var token = os.Getenv("github-token")
+var token = os.Getenv("GITHUB_TOKEN")
 
 func main() {
 	ctx := context.Background()
@@ -44,13 +44,12 @@ func main() {
 	// function. Each flow "Foo" has its own `Get"Foo"` function.
 	issue, err := goaction.GetIssues()
 	if err != nil {
-		log.Errorf("Failed getting issue information: %s", err)
-		os.Exit(1)
+		log.Fatalf("Failed getting issue information: %s", err)
 	}
 
 	// Create a Github Client using the token provided through environment.
 	if token == "" {
-		log.Errorf("Token was not provided, please define the Github action 'with' 'github-token' as '${{ secrets.GITHUB_TOKEN }}'")
+		log.Fatalf("Token was not provided, please define the Github action 'with' 'github-token' as '${{ secrets.GITHUB_TOKEN }}'")
 	}
 	gh := actionutil.NewClientWithToken(ctx, token)
 
@@ -61,28 +60,28 @@ func main() {
 			Body: github.String(fmt.Sprintf("Hey there %s! Thanks for trying %s", goaction.Actor, goaction.ActionID)),
 		})
 		if err != nil {
-			log.Errorf("Failed commenting: %s", err)
+			log.Fatalf("Failed commenting: %s", err)
 		}
 	case "closed":
 		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String("Thanks for cleaning up!"),
 		})
 		if err != nil {
-			log.Errorf("Failed commenting: %s", err)
+			log.Fatalf("Failed commenting: %s", err)
 		}
 	case "reponed":
 		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String("Welcome back!"),
 		})
 		if err != nil {
-			log.Errorf("Failed commenting: %s", err)
+			log.Fatalf("Failed commenting: %s", err)
 		}
 	case "edited":
 		_, _, err := gh.IssuesCreateComment(ctx, issue.GetIssue().GetNumber(), &github.IssueComment{
 			Body: github.String("I'll always have the last word!"),
 		})
 		if err != nil {
-			log.Errorf("Failed commenting: %s", err)
+			log.Fatalf("Failed commenting: %s", err)
 		}
 	case "labeled":
 		if issue.GetLabel().GetName() == "bug" {
@@ -90,17 +89,17 @@ func main() {
 				Body: github.String("Really?? A bug? No way!"),
 			})
 			if err != nil {
-				log.Errorf("Failed commenting: %s", err)
+				log.Fatalf("Failed commenting: %s", err)
 			}
 			_, err = gh.IssuesDeleteLabel(ctx, "bug")
 			if err != nil {
-				log.Errorf("Failed commenting: %s", err)
+				log.Fatalf("Failed commenting: %s", err)
 			}
 		} else {
 			log.Warnf("Ignoring label %s", issue.GetLabel().GetName())
 		}
 	case "deleted", "transferred", "pinned", "unpinned", "assigned", "unassigned",
 		"unlabeled", "locked", "unlocked", "milestoned", "demilestoned":
-		log.Errorf("Unexpected issue action %s", issue.GetAction())
+		log.Fatalf("Unexpected issue action %s", issue.GetAction())
 	}
 }
