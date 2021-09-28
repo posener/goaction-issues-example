@@ -10,7 +10,7 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v2
     - name: Update readme according to Go doc
-      uses: posener/goreadme@v1.4.2
+      uses: posener/goreadme@v1
       with:
         title: Goaction Issues Example
         GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
